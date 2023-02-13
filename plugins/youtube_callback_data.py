@@ -16,24 +16,44 @@ from helper.ytdlfunc import downloadvideocli, downloadaudiocli
 @Client.on_callback_query()
 async def catch_youtube_fmtid(c, m):
     cb_data = m.data
-    if cb_data.startswith("ytdata||"):
-        yturl = cb_data.split("||")[-1]
-        format_id = cb_data.split("||")[-2]
-        media_type = cb_data.split("||")[-3].strip()
-        print(media_type)
-        if media_type == 'audio':
-            buttons = InlineKeyboardMarkup([[InlineKeyboardButton(
-                "Audio", callback_data=f"{media_type}||{format_id}||{yturl}"), InlineKeyboardButton("Document",
-                                                                                                    callback_data=f"docaudio||{format_id}||{yturl}")]])
-        else:
-            buttons = InlineKeyboardMarkup([[InlineKeyboardButton(
-                "Video", callback_data=f"{media_type}||{format_id}||{yturl}"), InlineKeyboardButton("Document",
-                                                                                                    callback_data=f"docvideo||{format_id}||{yturl}")]])
-
-        await m.edit_message_reply_markup(buttons)
-
-    else:
+    if not cb_data.startswith("ytdata||"):
         raise ContinuePropagation
+    yturl = cb_data.split("||")[-1]
+    format_id = cb_data.split("||")[-2]
+    media_type = cb_data.split("||")[-3].strip()
+    print(media_type)
+    buttons = (
+        InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        "Audio",
+                        callback_data=f"{media_type}||{format_id}||{yturl}",
+                    ),
+                    InlineKeyboardButton(
+                        "Document",
+                        callback_data=f"docaudio||{format_id}||{yturl}",
+                    ),
+                ]
+            ]
+        )
+        if media_type == 'audio'
+        else InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        "Video",
+                        callback_data=f"{media_type}||{format_id}||{yturl}",
+                    ),
+                    InlineKeyboardButton(
+                        "Document",
+                        callback_data=f"docvideo||{format_id}||{yturl}",
+                    ),
+                ]
+            ]
+        )
+    )
+    await m.edit_message_reply_markup(buttons)
 
 
 @Client.on_callback_query()
